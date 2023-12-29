@@ -7,17 +7,15 @@ import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 
 const PublishPage = () => {
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
-  const [htmlString, setHtmlString] = useState("");
+  const [content, setContent] = useState("");
 
-  const updateTextDescription = async (state) => {
+  const onEditorStateChange = async (state) => {
     await setEditorState(state);
     const html = draftjsToHtml(convertToRaw(editorState.getCurrentContent()));
-    setHtmlString(html);
+    setContent(html);
   };
 
-  const uploadCallback = () => {
-    console.log("이미지 업로드");
-  };
+  const uploadCallback = () => {};
 
   return (
     <form className="w-[50%] mx-auto py-8">
@@ -26,19 +24,19 @@ const PublishPage = () => {
         <Input variant="flushed" placeholder="Sub title" size="md" />
         <Editor
           editorState={editorState}
-          onEditorStateChange={updateTextDescription}
+          onEditorStateChange={onEditorStateChange}
           toolbar={{
-            image: { uploadCallback: uploadCallback },
+            image: { uploadCallback },
           }}
           localization={{ locale: "ko" }}
           editorStyle={{
-            height: "400px",
+            height: "800px",
             width: "100%",
-            border: "3px solid lightgray",
-            padding: "20px",
+            border: "1px solid lightgray",
+            padding: "12px",
           }}
         />
-        <Button>publish</Button>
+        <Button colorScheme="twitter">publish</Button>
       </Stack>
     </form>
   );
