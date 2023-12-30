@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Stack, Input, Button } from "@chakra-ui/react";
 import { Editor } from "react-draft-wysiwyg";
-import { EditorState, convertToRaw } from "draft-js";
+import { DraftHandleValue, EditorState, convertToRaw } from "draft-js";
 import draftjsToHtml from "draftjs-to-html";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
+import axios from "axios";
 
 const PublishPage = () => {
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
@@ -15,7 +16,21 @@ const PublishPage = () => {
     setContent(html);
   };
 
-  const uploadCallback = () => {};
+  const uploadCallback = async (file: Blob) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+
+      reader.onloadend = async () => {
+        const formData = new FormData();
+        formData.append("image", file);
+        const res = await axios.post("http://localhost:3000/image", formData);
+
+        resolve({ data: { link: res.data } });
+      };
+
+      reader.readAsDataURL(file);
+    });
+  };
 
   return (
     <form className="w-[50%] mx-auto py-8">
