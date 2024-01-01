@@ -1,14 +1,33 @@
 import { AddIcon } from "@chakra-ui/icons";
 import { Button, ButtonGroup, IconButton } from "@chakra-ui/react";
-import { useCallback } from "react";
+import axios from "axios";
+import { useCallback, useContext } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
+import { SessionContext } from "./context/login.context";
 
 const Layout = () => {
   const navi = useNavigate();
+  const { isLogin, setIsLogin } = useContext(SessionContext);
 
   const routeToPublishPage = useCallback(() => {
     navi("/publish");
   }, [navi]);
+
+  const routeToLoginPage = useCallback(() => {
+    navi("/login");
+  }, [navi]);
+
+  const onClickLogout = () => {
+    localStorage.removeItem("user");
+    axios
+      .delete("http://localhost:3000/login", {
+        withCredentials: true,
+      })
+      .then(() => {
+        setIsLogin(false);
+        navi("/");
+      });
+  };
 
   return (
     <>
@@ -23,20 +42,31 @@ const Layout = () => {
           <h1 className="text-2xl font-thin">My Blog</h1>
 
           <div>
-            <ButtonGroup size="sm" isAttached variant="outline">
-              <Button colorScheme="red" variant="outline">
-                Log out
+            {isLogin ? (
+              <ButtonGroup size="sm" isAttached variant="outline">
+                <Button
+                  colorScheme="red"
+                  variant="outline"
+                  onClick={onClickLogout}
+                >
+                  Log out
+                </Button>
+                <IconButton
+                  aria-label="publish"
+                  icon={<AddIcon />}
+                  onClick={routeToPublishPage}
+                />
+              </ButtonGroup>
+            ) : (
+              <Button
+                colorScheme="messenger"
+                variant="outline"
+                size="sm"
+                onClick={routeToLoginPage}
+              >
+                Log in
               </Button>
-              <IconButton
-                aria-label="publish"
-                icon={<AddIcon />}
-                onClick={routeToPublishPage}
-              />
-            </ButtonGroup>
-
-            <Button colorScheme="messenger" variant="outline" size="sm">
-              Log in
-            </Button>
+            )}
           </div>
         </div>
       </div>
